@@ -9,18 +9,37 @@ function News() {
   // console.log(query);
   const [news, setNews] = useState([]);
   useEffect(() => {
-    // https://newsapi.org/v2/everything?q=sonam%20wangchuk&sortBy=popularity&apiKey=360aee87752645b2b4a3439322e07b73
-    const news_api_key = import.meta.env.VITE_NEWS_API_KEY;
-    // https://newsapi.org/v2/everything?q=sonam%20wangchuk&sortBy=popularity&apiKey=360aee87752645b2b4a3439322e07b73
-    fetch(`https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=popularity&apiKey=${news_api_key}`)
+    if (!query) return;
+
+    // Use the serverless function for production and direct API for development
+    const isDevelopment = import.meta.env.DEV;
+    
+    let fetchUrl;
+    if (isDevelopment) {
+      // Development - use direct API call
+      const news_api_key = import.meta.env.VITE_NEWS_API_KEY;
+      fetchUrl = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=popularity&apiKey=${news_api_key}`;
+    } else {
+      // Production - use serverless function
+      fetchUrl = `/api/news?query=${encodeURIComponent(query)}`;
+    }
+
+    fetch(fetchUrl)
       .then(res => {
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`)
         }
         return res.json();
       })
-      .then(data => setNews(data.articles))
-      .catch((error) => console.log(`Error fetching news: ${error}`))
+      .then(data => {
+        // Handle response based on environment
+        const articles = isDevelopment ? data.articles : data.articles;
+        setNews(articles || []);
+      })
+      .catch((error) => {
+        console.error(`Error fetching news: ${error}`);
+        setNews([]); // Set empty array on error
+      })
   }, [query])
 
   function getFaviconUrl(url) {

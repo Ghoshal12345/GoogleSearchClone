@@ -1,0 +1,16 @@
+{
+    "functions": {
+        "api/news.js": {
+            "runtime": "@vercel/node"
+        }
+    },
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ],
+    "env": {
+        "VITE_NEWS_API_KEY": "@vite_news_api_key"
+    }
+}
