@@ -38,7 +38,7 @@ export default function Home() {
                         rules={{ required: true }}
                         render={({ field }) => (
                             <SearchInput
-                                placeholder="Search Zoho or type a URL"
+                                placeholder="Search Google or type a URL"
                                 {...field}
                                 className="min-w-[700px]"
                             />

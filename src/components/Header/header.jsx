@@ -65,7 +65,7 @@ function Header() {
                         rules={{ required: true }}
                         render={({ field }) => (
                             <SearchInput
-                                placeholder="Search Choogle or type a URL"
+                                placeholder="Search Google or type a URL"
                                 {...field}
                                 className="min-w-[700px] "
                             />
