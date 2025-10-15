@@ -8,7 +8,7 @@ export default function Footer() {
     return (
         <div className={classes.footer}>
             <Container className={classes.inner}>
-                Choogle se licensed hai
+                    Google
                 <Group gap={0} className={classes.links} justify="flex-end" wrap="nowrap">
                     <ActionIcon size="lg" color="gray" variant="subtle">
                         <IconBrandTwitter size={18} stroke={1.5} />
