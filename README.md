@@ -2,8 +2,6 @@
 
 <div align="center">
 
-![Google Clone Logo](https://img.shields.io/badge/Google-Clone-4285F4?style=for-the-badge&logo=google&logoColor=white)
-
 A React-based Google Search clone with comprehensive search capabilities, responsive design, and modern UI.
 
 [![React](https://img.shields.io/badge/React-18-blue?style=flat-square&logo=react)](https://reactjs.org/)
@@ -77,8 +75,7 @@ VITE_NEWS_API_KEY=your_news_api_key
 ```bash
 npm run dev
 ```
-
-Visit [http://localhost:5173](http://localhost:5173) in your browser.
+Visit [https://google-search-clone-nu.vercel.app/](https://google-search-clone-nu.vercel.app/) in your browser.
 
 ## 📜 Available Scripts
 
@@ -114,7 +111,7 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 ## 🙏 Acknowledgments
 
-- React team for the amazing library
+- React for the amazing library
 - Mantine UI for beautiful components
 - Tailwind CSS for streamlined styling
 - Vite for the blazing fast development experience
