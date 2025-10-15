@@ -37,10 +37,10 @@ function Header() {
             name: "All",
             path: `/results?query=${encodeURIComponent(query)}`
         },
-        {
-            name: "News",
-            path: `/results/news?query=${encodeURIComponent(query)}`
-        },
+        // {
+        //     name: "News",
+        //     path: `/results/news?query=${encodeURIComponent(query)}`
+        // },
         {
             name: "Images",
             path: `/results/images?query=${encodeURIComponent(query)}`
