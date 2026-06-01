@@ -7,40 +7,60 @@ function useQuery() {
 function Images() {
   const query = useQuery().get("query");
 
-  // It's better to store keys in environment variables
-  const API_KEY = import.meta.env.VITE_API_KEY;
-  const CX_KEY = import.meta.env.VITE_CX_KEY;
-
   const [images, setImages] = useState([]);
-  useEffect(() => {
-    if(!query) return;
-    const base_url=`https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${CX_KEY}&q=${encodeURIComponent(query)}&searchType=image`;
 
-    Promise.all([
-      fetch(`${base_url}&start=1`).then(res=> res.json()),
-      fetch(`${base_url}&start=11`).then(res=> res.json()),
-      fetch(`${base_url}&start=21`).then(res=> res.json())
-    ])
-    .then(([res1, res2,res3])=>{
-      const validImages1 = res1.items.filter(
-        item => item.link && item.image && item.image.thumbnailLink && item.mime && item.mime.startsWith("image/") &&
-    /\.(jpg|jpeg|png|webp)$/i.test(item.link)
-  );
-      const validImages2 = res2.items.filter(
-        item => item.link && item.image && item.image.thumbnailLink && item.mime && item.mime.startsWith("image/") &&
-    /\.(jpg|jpeg|png|webp)$/i.test(item.link)
-      );
-      const validImages3 = res3.items.filter(
-        item => item.link && item.image && item.image.thumbnailLink && item.mime && item.mime.startsWith("image/") &&
-    /\.(jpg|jpeg|png|webp)$/i.test(item.link)
-      );
-      setImages([...validImages1, ...validImages2,...validImages3]);
-    })
-    .catch(error => {
-      console.error("Error fetching images:", error);
-      setImages([]);
-    })
-  },[query, API_KEY, CX_KEY])
+  useEffect(() => {
+    if (!query) return;
+
+    // 1. Move environment variables INSIDE the effect so they don't need to be in the dependency array
+    const API_KEY = import.meta.env.VITE_API_KEY;
+    const CX_KEY = import.meta.env.VITE_CX_KEY;
+    const baseUrl = `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${CX_KEY}&q=${encodeURIComponent(query)}&searchType=image`;
+
+    // 2. Helper function to fetch a single page and cleanly filter the valid images
+    const fetchPageAndFilter = async (start) => {
+      try {
+        const res = await fetch(`${baseUrl}&start=${start}`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        
+        const data = await res.json();
+        
+        // Defensive check: If Google finds 0 results, data.items is undefined. Fallback to []
+        const items = data.items || [];
+
+        // Single, clean filter logic applied universally
+        return items.filter(item =>
+          item?.link && 
+          item?.image?.thumbnailLink && 
+          item?.mime?.startsWith("image/") &&
+          /\.(jpg|jpeg|png|webp)$/i.test(item.link)
+        );
+      } catch (err) {
+        console.error(`Failed to fetch page starting at ${start}:`, err);
+        return []; // Return empty array so Promise.all doesn't fail completely
+      }
+    };
+
+    // 3. Orchestrate concurrent requests using Promise.all + async/await
+    const fetchAllImages = async () => {
+      try {
+        // Fires all three network requests simultaneously (parallel execution)
+        const [page1, page2, page3] = await Promise.all([
+          fetchPageAndFilter(1),
+          fetchPageAndFilter(11),
+          fetchPageAndFilter(21)
+        ]);
+
+        // Combine the results cleanly using the spread operator
+        setImages([...page1, ...page2, ...page3]);
+      } catch (error) {
+        console.error("Critical error in Promise.all execution:", error);
+        setImages([]);
+      }
+    };
+
+    fetchAllImages();
+  }, [query]);
 
   function getFaviconUrl(displayLink) {
     if (!displayLink) return null;
