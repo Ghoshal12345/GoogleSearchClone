@@ -12,26 +12,35 @@ function AllResults() {
   useEffect(() => {
     if (!query) return;
 
-    // It's better to store keys in environment variables
-    const API_KEY = import.meta.env.VITE_API_KEY;
-    const CX_KEY = import.meta.env.VITE_CX_KEY;
+  useEffect(() => {
+  if (!query) return;
 
-    fetch(
-      `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${CX_KEY}&q=${encodeURIComponent(query)}`
-    )
-      .then((res) => {
+    // 1. Define the async function inside the effect
+    const fetchSearchResults = async () => {
+      const API_KEY = import.meta.env.VITE_API_KEY;
+      const CX_KEY = import.meta.env.VITE_CX_KEY;
+
+      try {
+        const res = await fetch(
+          `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${CX_KEY}&q=${encodeURIComponent(query)}`
+        );
+
+        // Handle HTTP errors (like 404 or 500)
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
-        return res.json();
-      })
-      .then((res) => {
-        // console.log(res.items)
-        setResults(res.items)
-      })
-      .catch((error) => {
+
+        const data = await res.json();
+        setResults(data.items || []); // Defensive check: fallback to empty array if no items found
+        
+      } catch (error) {
         console.error("Error fetching web results:", error);
-      })
+      }
+    };
+
+    // 2. Call the function immediately
+    fetchSearchResults();
+
   }, [query]);
 
   function getFaviconUrl(displayLink) {
